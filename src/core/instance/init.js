@@ -13,11 +13,13 @@ import { extend, mergeOptions, formatComponentName } from '../util/index'
 let uid = 0
 
 export function initMixin (Vue: Class<Component>) {
+  // new Vue 时的传参对象：options
   Vue.prototype._init = function (options?: Object) {
     const vm: Component = this
-    // a uid
+    // unique id，用于标记每一个 Vue 实例
     vm._uid = uid++
 
+    // 用于开启记录组件在浏览器中的渲染表现（chrome 中的 performance）
     let startTag, endTag
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
@@ -26,9 +28,12 @@ export function initMixin (Vue: Class<Component>) {
       mark(startTag)
     }
 
+    // _isVue 是用于防止实例被设置为响应式数据（全局搜索 _isVue 可在 observer 中找到）
     // a flag to avoid this being observed
     vm._isVue = true
+    // 合并参数
     // merge options
+    // TODO【待验证】当组件拥有子组件时，options._isComponent 才为 true
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
