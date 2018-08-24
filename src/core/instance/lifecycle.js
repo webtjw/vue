@@ -24,6 +24,7 @@ export let isUpdatingChildComponent: boolean = false
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 
+  // 寻找当前实例的第一个非抽象祖先元素（抽象组件：keep-alive / transition 等）
   // locate first non-abstract parent
   let parent = options.parent
   if (parent && !options.abstract) {
@@ -33,6 +34,7 @@ export function initLifecycle (vm: Component) {
     parent.$children.push(vm)
   }
 
+  // $parent 和 $root
   vm.$parent = parent
   vm.$root = parent ? parent.$root : vm
 

@@ -40,7 +40,7 @@ export function updateComponentListeners (
 ) {
   target = vm
   updateListeners(listeners, oldListeners || {}, add, remove, vm)
-  target = undefined
+  target = undefined // 释放内存
 }
 
 export function eventsMixin (Vue: Class<Component>) {
