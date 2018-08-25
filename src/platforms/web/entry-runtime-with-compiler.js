@@ -21,6 +21,7 @@ Vue.prototype.$mount = function (
 ): Component {
   el = el && query(el)
 
+  // 只能挂载在普通的 html 节点
   /* istanbul ignore if */
   if (el === document.body || el === document.documentElement) {
     process.env.NODE_ENV !== 'production' && warn(

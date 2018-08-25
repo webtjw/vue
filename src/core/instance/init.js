@@ -57,11 +57,12 @@ export function initMixin (Vue: Class<Component>) {
     // expose real self
     vm._self = vm
     initLifecycle(vm) // 设置属性 $parent / $root / $children /$refs
-    initEvents(vm) // 
-    initRender(vm)
+    initEvents(vm) // 为组件更新事件处理器
+    initRender(vm) // runtime 下把子节点模板编译为 slots 对象
     callHook(vm, 'beforeCreate')
+    // TODO inject 的内容是？？
     initInjections(vm) // resolve injections before data/props
-    initState(vm)
+    initState(vm) // 将 props，data 设为响应式数据，methods 校验 + 绑定 context + 绑定在 vm 上
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 

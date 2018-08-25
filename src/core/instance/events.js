@@ -15,7 +15,7 @@ export function initEvents (vm: Component) {
   // init parent attached events
   const listeners = vm.$options._parentListeners
   if (listeners) {
-    updateComponentListeners(vm, listeners)
+    updateComponentListeners(vm, listeners) // 为实例 vm 注册事件处理
   }
 }
 
@@ -39,7 +39,7 @@ export function updateComponentListeners (
   oldListeners: ?Object
 ) {
   target = vm
-  updateListeners(listeners, oldListeners || {}, add, remove, vm)
+  updateListeners(listeners, oldListeners || {}, add, remove, vm) // 对比新旧事件处理器列表，新添加的执行 add，旧删除的执行 remove，不同的取新处理
   target = undefined // 释放内存
 }
 

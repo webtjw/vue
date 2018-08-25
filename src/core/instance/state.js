@@ -64,6 +64,7 @@ export function initState (vm: Component) {
 function initProps (vm: Component, propsOptions: Object) {
   const propsData = vm.$options.propsData || {}
   const props = vm._props = {}
+  // _propKeys 用于缓存 props key，以便于将来的更新迭代
   // cache prop keys so that future props updates can iterate using Array
   // instead of dynamic object key enumeration.
   const keys = vm.$options._propKeys = []

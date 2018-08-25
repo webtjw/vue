@@ -16,11 +16,16 @@ import VNode, { createEmptyVNode } from '../vdom/vnode'
 import { isUpdatingChildComponent } from './lifecycle'
 
 export function initRender (vm: Component) {
+  // 子组件的根节点
   vm._vnode = null // the root of the child tree
   vm._staticTrees = null // v-once cached trees
   const options = vm.$options
+  // 当前组件对应的虚拟节点，也是在父组件中的占位符
+  // TODO vm.$vnode 和 vm._vnode 区别
   const parentVnode = vm.$vnode = options._parentVnode // the placeholder node in parent tree
+  // 渲染时的上下文是当前组件虚拟节点的上下文
   const renderContext = parentVnode && parentVnode.context
+  // 处理组件 slot
   vm.$slots = resolveSlots(options._renderChildren, renderContext)
   vm.$scopedSlots = emptyObject
   // bind the createElement fn to this instance

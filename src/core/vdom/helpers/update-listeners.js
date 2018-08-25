@@ -42,6 +42,7 @@ export function createFnInvoker (fns: Function | Array<Function>): Function {
   return invoker
 }
 
+// 组件更新前后分别拥有一组事件处理，已更新后的为准
 export function updateListeners (
   on: Object,
   oldOn: Object,
@@ -53,6 +54,7 @@ export function updateListeners (
   for (name in on) {
     def = cur = on[name]
     old = oldOn[name]
+    // 解析事件属性：name / once / capture / passive
     event = normalizeEvent(name)
     /* istanbul ignore if */
     if (__WEEX__ && isPlainObject(def)) {
@@ -60,6 +62,7 @@ export function updateListeners (
       event.params = def.params
     }
     if (isUndef(cur)) {
+      // 【dev】事件处理函数不存在则报错
       process.env.NODE_ENV !== 'production' && warn(
         `Invalid handler for event "${event.name}": got ` + String(cur),
         vm
