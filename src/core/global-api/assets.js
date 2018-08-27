@@ -4,6 +4,7 @@ import { ASSET_TYPES } from 'shared/constants'
 import { isPlainObject, validateComponentName } from '../util/index'
 
 export function initAssetRegisters (Vue: GlobalAPI) {
+  // Vue 和拓展类用的资源注册器：Vue.component / Vue.filter / Vue.directive
   /**
    * Create asset registration methods.
    */
@@ -21,7 +22,7 @@ export function initAssetRegisters (Vue: GlobalAPI) {
         }
         if (type === 'component' && isPlainObject(definition)) {
           definition.name = definition.name || id
-          definition = this.options._base.extend(definition)
+          definition = this.options._base.extend(definition) // _base 其实就是 Vue
         }
         if (type === 'directive' && typeof definition === 'function') {
           definition = { bind: definition, update: definition }

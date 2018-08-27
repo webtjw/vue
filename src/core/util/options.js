@@ -53,6 +53,8 @@ function mergeData (to: Object, from: ?Object): Object {
     key = keys[i]
     toVal = to[key]
     fromVal = from[key]
+    // 添加新属性并设为可响应数据
+    // TODO 为什么只给新属性设置？？？？？？？？？需要查出来在此之前在何处做了设置
     if (!hasOwn(to, key)) {
       set(to, key, fromVal)
     } else if (isPlainObject(toVal) && isPlainObject(fromVal)) {
@@ -71,6 +73,7 @@ export function mergeDataOrFn (
   vm?: Component
 ): ?Function {
   if (!vm) {
+    // 在 Vue.extend 中，child.data / parent.data 只能是函数或 undefined
     // in a Vue.extend merge, both should be functions
     if (!childVal) {
       return parentVal
@@ -78,6 +81,7 @@ export function mergeDataOrFn (
     if (!parentVal) {
       return childVal
     }
+    // 当 child.data 和 parent.data 都存在时，需要二者返回的对象再合并，详细看【mergeData】
     // when parentVal & childVal are both present,
     // we need to return a function that returns the
     // merged result of both functions... no need to
@@ -113,6 +117,8 @@ strats.data = function (
   vm?: Component
 ): ?Function {
   if (!vm) {
+    // 通过 Vue.extend / Vue.component 调用 mergeOptions 时，child.data 非空时必须是一个返回一个对象的函数
+    // 如果 child.data 为空，则返回 prent.data
     if (childVal && typeof childVal !== 'function') {
       process.env.NODE_ENV !== 'production' && warn(
         'The "data" option should be a function ' +
@@ -269,6 +275,7 @@ export function validateComponentName (name: string) {
 }
 
 /**
+ * 标准化 props：数组转对象，命名转驼峰式
  * Ensure all props option syntax are normalized into the
  * Object-based format.
  */
@@ -307,6 +314,7 @@ function normalizeProps (options: Object, vm: ?Component) {
 }
 
 /**
+ * 标准化 normalizeProps：数组转对象，无 from 属性的将添加 from 属性指向 key 自身
  * Normalize all injections into Object-based format
  */
 function normalizeInject (options: Object, vm: ?Component) {
@@ -334,6 +342,7 @@ function normalizeInject (options: Object, vm: ?Component) {
 }
 
 /**
+ * 标准化指令：函数转对象 { bind: foo, update: foo }
  * Normalize raw function directives into object format.
  */
 function normalizeDirectives (options: Object) {
@@ -362,7 +371,7 @@ function assertObjectType (name: string, value: any, vm: ?Component) {
  * Merge two option objects into a new one.
  * Core utility used in both instantiation and inheritance.
  */
-// 当 mergeOptions 传参时 vm 不为空，则说明是 new Vue 触发的合并；为空时，则是 Vue.extend / Vue.component 在调用
+// 当 vm 不为空时，mergeOptions 是由 new Vue 触发调用；为空时，则是 Vue.extend / Vue.component 在调用
 export function mergeOptions (
   parent: Object,
   child: Object,
@@ -376,28 +385,37 @@ export function mergeOptions (
     child = child.options
   }
 
-  normalizeProps(child, vm)
-  normalizeInject(child, vm)
-  normalizeDirectives(child)
+  normalizeProps(child, vm) // 标准化 childOptions.props
+  normalizeInject(child, vm) // 标准化 childOptions.inject
+  normalizeDirectives(child) // 标准化 childOptions.directives
+  // 如果有拓展组件，先与拓展组件合并
   const extendsFrom = child.extends
   if (extendsFrom) {
     parent = mergeOptions(parent, extendsFrom, vm)
   }
+  // 如有 mixins，再和 mixins 合并
   if (child.mixins) {
     for (let i = 0, l = child.mixins.length; i < l; i++) {
       parent = mergeOptions(parent, child.mixins[i], vm)
     }
   }
+  // 用于存放最后的 options
   const options = {}
+  // 根据不同的选项，选择不同的合并策略
   let key
   for (key in parent) {
     mergeField(key)
   }
+  // 对 parent 上不存在的属性，需要添加
   for (key in child) {
     if (!hasOwn(parent, key)) {
       mergeField(key)
     }
   }
+  /**
+   * 合并策略汇总：
+   * - data: 
+   */
   function mergeField (key) {
     const strat = strats[key] || defaultStrat
     options[key] = strat(parent[key], child[key], vm, key)

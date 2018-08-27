@@ -33,14 +33,14 @@ export function initMixin (Vue: Class<Component>) {
     vm._isVue = true
     // 合并参数
     // merge options
-    // TODO【待验证】当组件拥有子组件时，options._isComponent 才为 true
+    // TODO options._isComponent 意义未明
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
       initInternalComponent(vm, options)
     } else {
-      // 实例的 options
+      // 实例的 options 是根据实例选项不同的策略分别合并或替换后的结果，可查 mergeOptions 定义
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
@@ -60,7 +60,7 @@ export function initMixin (Vue: Class<Component>) {
     initEvents(vm) // 为组件更新事件处理器
     initRender(vm) // runtime 下把子节点模板编译为 slots 对象
     callHook(vm, 'beforeCreate')
-    // TODO inject 的内容是？？
+    // 处理 provide / inject
     initInjections(vm) // resolve injections before data/props
     initState(vm) // 将 props，data 设为响应式数据，methods 校验 + 绑定 context + 绑定在 vm 上
     initProvide(vm) // resolve provide after data/props
