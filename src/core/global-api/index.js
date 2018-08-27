@@ -44,7 +44,8 @@ export function initGlobalAPI (Vue: GlobalAPI) {
   Vue.delete = del
   Vue.nextTick = nextTick
 
-  Vue.options = Object.create(null)
+  Vue.options = Object.create(null) // Vue.options
+  // component / directive / filter
   ASSET_TYPES.forEach(type => {
     Vue.options[type + 's'] = Object.create(null)
   })
