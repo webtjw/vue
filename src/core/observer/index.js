@@ -203,9 +203,10 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   }
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
-    target.splice(key, 1, val)
+    target.splice(key, 1, val) // Array.prototype.splice 自动发出通知
     return val
   }
+  // 已存在属性
   if (key in target && !(key in Object.prototype)) {
     target[key] = val
     return val

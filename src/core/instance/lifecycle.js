@@ -24,7 +24,7 @@ export let isUpdatingChildComponent: boolean = false
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 
-  // 寻找当前实例的第一个非抽象祖先元素（抽象组件：keep-alive / transition 等）
+  // 如果组件自身是非抽象的，则寻找组件的第一个非抽象祖先元素（抽象组件：keep-alive）
   // locate first non-abstract parent
   let parent = options.parent
   if (parent && !options.abstract) {
@@ -41,12 +41,12 @@ export function initLifecycle (vm: Component) {
   vm.$children = []
   vm.$refs = {}
 
-  vm._watcher = null
-  vm._inactive = null
-  vm._directInactive = false
-  vm._isMounted = false
-  vm._isDestroyed = false
-  vm._isBeingDestroyed = false
+  vm._watcher = null // 组件对应的 Watcher 实例
+  vm._inactive = null // 表示keep-alive中组件状态，如被激活，该值为 false，反之为 true
+  vm._directInactive = false // keep-alive 中组件状态的属性
+  vm._isMounted = false // 是否已挂载
+  vm._isDestroyed = false // 是否已销毁
+  vm._isBeingDestroyed = false // 是否正在摧毁中
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
