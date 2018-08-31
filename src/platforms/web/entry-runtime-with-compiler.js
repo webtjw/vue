@@ -9,6 +9,7 @@ import { query } from './util/index'
 import { compileToFunctions } from './compiler/index'
 import { shouldDecodeNewlines, shouldDecodeNewlinesForHref } from './util/compat'
 
+// 缓存纯函数：通过 id 查找元素
 const idToTemplate = cached(id => {
   const el = query(id)
   return el && el.innerHTML
@@ -30,6 +31,7 @@ Vue.prototype.$mount = function (
     return this
   }
 
+  // mergeOptions 的结果
   const options = this.$options
   // resolve template/el and convert to render function
   if (!options.render) {

@@ -27,8 +27,17 @@ Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
-extend(Vue.options.directives, platformDirectives)
-extend(Vue.options.components, platformComponents)
+extend(Vue.options.directives, platformDirectives) // 注册全局指令 model show
+extend(Vue.options.components, platformComponents) // 注册全局组件 transition transition-group
+
+/**
+ * 到这里 Vue.potions = {
+ *  components: {KeepAlive, Transition, TransitionGroup},
+ *  directives: {model, show},
+ *  filters: {},
+ *  _base: Vue
+ * }
+ */
 
 // install platform patch function
 Vue.prototype.__patch__ = inBrowser ? patch : noop

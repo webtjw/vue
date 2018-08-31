@@ -61,7 +61,8 @@ export function initGlobalAPI (Vue: GlobalAPI) {
    * 到这里 Vue.potions = {
    *  components: {KeepAlive},
    *  directives: {},
-   *  filters: {}
+   *  filters: {},
+   *  _base: Vue
    * }
    */
 

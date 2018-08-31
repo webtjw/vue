@@ -32,6 +32,7 @@ const strats = config.optionMergeStrategies
  */
 if (process.env.NODE_ENV !== 'production') {
   strats.el = strats.propsData = function (parent, child, vm, key) {
+    // 不传 vm 即说明当前是在执行 Vue.extend Vue.component 的选项合并，而这两个过程都是不需要 el 的
     if (!vm) {
       warn(
         `option "${key}" can only be used during instance ` +
@@ -117,7 +118,7 @@ strats.data = function (
   vm?: Component
 ): ?Function {
   if (!vm) {
-    // 通过 Vue.extend / Vue.component 调用 mergeOptions 时，child.data 非空时必须是一个返回一个对象的函数
+    // 通过 Vue.extend 调用 mergeOptions 时，child.data 非空时必须是一个返回一个对象的函数
     // 如果 child.data 为空，则返回 prent.data
     if (childVal && typeof childVal !== 'function') {
       process.env.NODE_ENV !== 'production' && warn(
@@ -371,23 +372,25 @@ function assertObjectType (name: string, value: any, vm: ?Component) {
  * Merge two option objects into a new one.
  * Core utility used in both instantiation and inheritance.
  */
-// 当 vm 不为空时，mergeOptions 是由 new Vue 触发调用；为空时，则是 Vue.extend / Vue.component 在调用
+// 当 vm 不为空时，mergeOptions 是由 new Vue 触发调用；为空时，则是 Vue.extend（Vue.component 调用的还是 Vue.extend） 在调用
 export function mergeOptions (
   parent: Object,
   child: Object,
   vm?: Component
 ): Object {
+  // 检查 options.components 中各子组件的命名是否合法
   if (process.env.NODE_ENV !== 'production') {
     checkComponents(child)
   }
 
+  // 一个 options 属性的函数？？Vue 便符合要求
   if (typeof child === 'function') {
     child = child.options
   }
 
-  normalizeProps(child, vm) // 标准化 childOptions.props
-  normalizeInject(child, vm) // 标准化 childOptions.inject
-  normalizeDirectives(child) // 标准化 childOptions.directives
+  normalizeProps(child, vm) // 标准化 childOptions.props：数组转对象，命名转驼峰式
+  normalizeInject(child, vm) // 标准化 childOptions.inject：数组转对象，无 from 属性的将添加 from 属性指向 key 自身
+  normalizeDirectives(child) // 标准化 childOptions.directives：函数转对象 { bind: foo, update: foo }
   // 如果有拓展组件，先与拓展组件合并
   const extendsFrom = child.extends
   if (extendsFrom) {
@@ -412,10 +415,7 @@ export function mergeOptions (
       mergeField(key)
     }
   }
-  /**
-   * 合并策略汇总：
-   * - data: 
-   */
+
   function mergeField (key) {
     const strat = strats[key] || defaultStrat
     options[key] = strat(parent[key], child[key], vm, key)

@@ -20,7 +20,7 @@ export function initExtend (Vue: GlobalAPI) {
     extendOptions = extendOptions || {}
     const Super = this // 不一定就是 Vue，因为 extend 方法到后面也会被添加到子类上
     const SuperId = Super.cid
-    // TODO 这里的缓存？？？extendOptions._Ctor 不可能由用户写入，哪究竟在哪写入的？
+    // TODO 这里的缓存？？？extendOptions._Ctor 不可能由用户写入，究竟在哪写入的？
     const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
     if (cachedCtors[SuperId]) {
       return cachedCtors[SuperId]

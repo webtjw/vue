@@ -101,15 +101,16 @@ export function initInternalComponent (vm: Component, options: InternalComponent
 // 用于获取构造类 Ctor 的 options
 export function resolveConstructorOptions (Ctor: Class<Component>) {
   let options = Ctor.options
-  // Ctor.super 说明该构造类是通过 Vue.extend 得到的子类（全局搜索 super 可知）
+  // Ctor.super 说明该构造类是通过 Vue.extend 得到的子类
   if (Ctor.super) {
-    // TODO 通过怎样的方式注入 options 更改呢？？
-    // 获取父类实际的 options（因为有可能在后续被注入一些 options 导致更改）
+    // 再次调用，因为 Ctor.super 有可能还有父类，需要一直到最原始的构造器 Vue
     const superOptions = resolveConstructorOptions(Ctor.super)
-    // 这个是在子类中缓存的父类的 options
+    // Ctor.superOptions 等同于 Ctor.constructor.options 也就是父类的选项
     const cachedSuperOptions = Ctor.superOptions
+    // 当父类缓存的 options 和实际的 options 不一致时，说明父类的 options 是被注入更改了，需要及时更新缓存在子类中的父类 options
+    // TODO 为什么会不一致，在哪里会被更改？？？这里仅仅是比对引用对象是否更改，浅对比
+    // Ctor.component 等 API 并不会修改自身的 options 引用和子类的 superOptions 引用，二者是恒等关系
     if (superOptions !== cachedSuperOptions) {
-      // 当父类缓存的 options 和实际的 options 不一致时，说明父类的 options 是被注入更改了，需要及时更新缓存在子类中的父类 options
       // super option changed,
       // need to resolve new options.
       Ctor.superOptions = superOptions

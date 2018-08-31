@@ -22,7 +22,8 @@ export function initAssetRegisters (Vue: GlobalAPI) {
         }
         if (type === 'component' && isPlainObject(definition)) {
           definition.name = definition.name || id
-          definition = this.options._base.extend(definition) // _base 其实就是 Vue
+          definition = this.options._base.extend(definition) // _base 其实就是 Vue，Vue.component 本质上执行的还是 Vue.extend
+          // TODO 因此全局注册 API Vue.component 是怎么应用到每一个实例中的？
         }
         if (type === 'directive' && typeof definition === 'function') {
           definition = { bind: definition, update: definition }
