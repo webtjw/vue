@@ -194,15 +194,17 @@ strats.watch = function (
   vm?: Component,
   key: string
 ): ?Object {
+  // 处理 FF 中的 Object.prototype.watch
   // work around Firefox's Object.prototype.watch...
   if (parentVal === nativeWatch) parentVal = undefined
   if (childVal === nativeWatch) childVal = undefined
   /* istanbul ignore if */
-  if (!childVal) return Object.create(parentVal || null)
+  if (!childVal) return Object.create(parentVal || null) // 如果没有子类 watch，则创建一个以父类 watch 为原型的对象
   if (process.env.NODE_ENV !== 'production') {
     assertObjectType(key, childVal, vm)
   }
-  if (!parentVal) return childVal
+  if (!parentVal) return childVal // 直接取子类 watch
+  // 同时存在时，对同一个 watch 项，先执行父类方法后执行子类方法
   const ret = {}
   extend(ret, parentVal)
   for (const key in childVal) {
@@ -219,6 +221,7 @@ strats.watch = function (
 }
 
 /**
+ * props / methods / inject / computed 都是以项拷贝覆盖
  * Other object hashes.
  */
 strats.props =
@@ -239,6 +242,7 @@ strats.computed = function (
   if (childVal) extend(ret, childVal)
   return ret
 }
+// provide 则类似 data 的合并策略（对象和函数2种情况）
 strats.provide = mergeDataOrFn
 
 /**

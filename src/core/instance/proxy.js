@@ -66,6 +66,7 @@ if (process.env.NODE_ENV !== 'production') {
     if (hasProxy) {
       // determine which proxy handler to use
       const options = vm.$options
+      // options.render._withStripped 只在测试代码中出现过，所以一般情况下这个条件都会为假，也就是使用 hasHandler 作为代理配置
       const handlers = options.render && options.render._withStripped
         ? getHandler
         : hasHandler
