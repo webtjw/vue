@@ -146,24 +146,28 @@ export function defineReactive (
   }
 
   // cater for pre-defined getter/setters
-  const getter = property && property.get
-  const setter = property && property.set
+  const getter = property && property.get // 可能有已定义的 getter
+  const setter = property && property.set // 可能有已定义的 setter
+  // 对满足此条件的情况，直接取值
   if ((!getter || setter) && arguments.length === 2) {
     val = obj[key]
   }
 
-  let childOb = !shallow && observe(val)
+  let childOb = !shallow && observe(val) // 假如该属性值也是一个对象的话，也要设置为响应式
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
-      const value = getter ? getter.call(obj) : val
+      const value = getter ? getter.call(obj) : val // 原值
+      // 从使用的角度上说，对依赖于响应式属性的值，需要把该属性依赖的所有的响应式属性都作为依赖收集起来，当任何依赖发生变化时，该值也能随之变化。
+      // 从源码看，初始化 computed 和 watch 这两个option 的时候会产生 Dep.target（data 不会）
+      // 如果存在 Dep.target 说明该属性的依赖需要被收集
       if (Dep.target) {
-        dep.depend()
+        dep.depend() // 属性被引用时，调用属性 getter，属性对应的依赖管理实例通过 dep.depend 向当前 Dep.target 添加依赖...
         if (childOb) {
-          childOb.dep.depend()
+          childOb.dep.depend() // 子对象也可能成为依赖，也要收集起来
           if (Array.isArray(value)) {
-            dependArray(value)
+            dependArray(value) // 收集数组中对象的依赖，那其他非对象的数组成员呢？TODO
           }
         }
       }
@@ -266,7 +270,7 @@ export function del (target: Array<any> | Object, key: any) {
 function dependArray (value: Array<any>) {
   for (let e, i = 0, l = value.length; i < l; i++) {
     e = value[i]
-    e && e.__ob__ && e.__ob__.dep.depend()
+    e && e.__ob__ && e.__ob__.dep.depend() // 收集数组中对象的依赖
     if (Array.isArray(e)) {
       dependArray(e)
     }

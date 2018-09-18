@@ -184,6 +184,7 @@ function initComputed (vm: Component, computed: Object) {
     }
 
     if (!isSSR) {
+      // 计算属性依赖于观察者对象 Watcher 收集依赖，响应依赖变化
       // create internal watcher for the computed property.
       watchers[key] = new Watcher(
         vm,

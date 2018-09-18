@@ -49,7 +49,8 @@ export default class Watcher {
     options?: ?Object,
     isRenderWatcher?: boolean
   ) {
-    this.vm = vm
+    this.vm = vm // Watcher 实例属性 vm
+    // TODO lifecycle.js 190
     if (isRenderWatcher) {
       vm._watcher = this
     }
