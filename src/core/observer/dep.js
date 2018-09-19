@@ -34,6 +34,7 @@ export default class Dep {
     }
   }
 
+  // 依赖项更改，触发了 setter，而依赖目标需要重新计算，因此依赖项 setter 中发出通知来重算依赖目标
   notify () {
     // stabilize the subscriber list first
     const subs = this.subs.slice()

@@ -161,11 +161,11 @@ export function defineReactive (
       const value = getter ? getter.call(obj) : val // 原值
       // 从使用的角度上说，对依赖于响应式属性的值，需要把该属性依赖的所有的响应式属性都作为依赖收集起来，当任何依赖发生变化时，该值也能随之变化。
       // 从源码看，初始化 computed 和 watch 这两个option 的时候会产生 Dep.target（data 不会）
-      // 如果存在 Dep.target 说明该属性的依赖需要被收集
+      // 如果存在 Dep.target，则说明当前有 Watcher 实例 的 getter 在被访问，并且该 Watcher 实例依赖于当前的 obj[key]
       if (Dep.target) {
-        dep.depend() // 属性被引用时，调用属性 getter，属性对应的依赖管理实例通过 dep.depend 向当前 Dep.target 添加依赖...
+        dep.depend() // 向依赖目标 Watcher 实例递交当前属性的 dep
         if (childOb) {
-          childOb.dep.depend() // 子对象也可能成为依赖，也要收集起来
+          childOb.dep.depend() // 子对象也是依赖，也要收集起来
           if (Array.isArray(value)) {
             dependArray(value) // 收集数组中对象的依赖，那其他非对象的数组成员呢？TODO
           }

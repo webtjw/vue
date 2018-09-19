@@ -214,7 +214,7 @@ export function defineComputed (
   key: string,
   userDef: Object | Function
 ) {
-  const shouldCache = !isServerRendering()
+  const shouldCache = !isServerRendering() // 非 ssr
   if (typeof userDef === 'function') {
     sharedPropertyDefinition.get = shouldCache
       ? createComputedGetter(key)
@@ -244,6 +244,8 @@ export function defineComputed (
 
 function createComputedGetter (key) {
   return function computedGetter () {
+    // 此处的 this 是指 vm
+    // vm._computedWatchers 已在前面定义，每个计算属性对应一个 Watcher 实例
     const watcher = this._computedWatchers && this._computedWatchers[key]
     if (watcher) {
       watcher.depend()

@@ -54,19 +54,19 @@ export default class Watcher {
     if (isRenderWatcher) {
       vm._watcher = this
     }
-    vm._watchers.push(this)
+    vm._watchers.push(this) // vm._watchers 是存放实例所有观察者实例的队列
     // options
     if (options) {
-      this.deep = !!options.deep
+      this.deep = !!options.deep // 深度
       this.user = !!options.user
-      this.computed = !!options.computed
+      this.computed = !!options.computed // 实例 computed option 时为 true
       this.sync = !!options.sync
       this.before = options.before
     } else {
       this.deep = this.user = this.computed = this.sync = false
     }
-    this.cb = cb
-    this.id = ++uid // uid for batching
+    this.cb = cb // 回调
+    this.id = ++uid // uid for batching 唯一的 id 用于分批处理
     this.active = true
     this.dirty = this.computed // for computed watchers
     this.deps = []
@@ -91,6 +91,7 @@ export default class Watcher {
         )
       }
     }
+    // 计算属性和非计算属性
     if (this.computed) {
       this.value = undefined
       this.dep = new Dep()
@@ -103,7 +104,7 @@ export default class Watcher {
    * Evaluate the getter, and re-collect dependencies.
    */
   get () {
-    pushTarget(this)
+    pushTarget(this) // Dep.target 为当前 Watcher 实例
     let value
     const vm = this.vm
     try {
@@ -115,6 +116,7 @@ export default class Watcher {
         throw e
       }
     } finally {
+      // 深度观察 TODO 暂时看不懂
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
       if (this.deep) {
@@ -127,6 +129,7 @@ export default class Watcher {
   }
 
   /**
+   * 依赖项的更新队列里加入当前 Watcher 实例，因此当依赖项变化时，依赖项可以根据其更新队列，有序地更新依赖目标 Watcher 
    * Add a dependency to this directive.
    */
   addDep (dep: Dep) {
@@ -235,7 +238,7 @@ export default class Watcher {
   evaluate () {
     if (this.dirty) {
       this.value = this.get()
-      this.dirty = false
+      this.dirty = false // TODO 计算属性特有
     }
     return this.value
   }
