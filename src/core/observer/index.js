@@ -44,6 +44,7 @@ export class Observer {
     this.dep = new Dep()
     this.vmCount = 0
     def(value, '__ob__', this)
+    // 向修改原数组方法添加依赖更新通知的能力
     if (Array.isArray(value)) {
       const augment = hasProto
         ? protoAugment
@@ -167,7 +168,7 @@ export function defineReactive (
         if (childOb) {
           childOb.dep.depend() // 子对象也是依赖，也要收集起来
           if (Array.isArray(value)) {
-            dependArray(value) // 收集数组中对象的依赖，那其他非对象的数组成员呢？TODO
+            dependArray(value) // 收集数组中对象的依赖，那其他非对象的数组成员呢？
           }
         }
       }

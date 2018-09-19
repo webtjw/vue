@@ -22,6 +22,7 @@ function _traverse (val: any, seen: SimpleSet) {
   if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
     return
   }
+  // 如果 val 本身也是一个响应式数据，那么 val 也有依赖项能力，val 变化时依赖目标也要变化
   if (val.__ob__) {
     const depId = val.__ob__.dep.id
     if (seen.has(depId)) {
@@ -35,6 +36,6 @@ function _traverse (val: any, seen: SimpleSet) {
   } else {
     keys = Object.keys(val)
     i = keys.length
-    while (i--) _traverse(val[keys[i]], seen)
+    while (i--) _traverse(val[keys[i]], seen) // 通过遍历，触发各个目标的 getter ，执行 getter 内部的 dep.depend() 收集依赖
   }
 }
