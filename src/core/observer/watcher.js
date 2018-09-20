@@ -116,7 +116,7 @@ export default class Watcher {
         throw e
       }
     } finally {
-      // 深度观察 TODO 暂时看不懂
+      // 收集 val 各属性为依赖项
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
       if (this.deep) {
